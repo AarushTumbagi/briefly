@@ -15,34 +15,15 @@ remembers what you've already read, so return visits show **only what's new**.
 
 ## How it works
 
-```mermaid
-flowchart TD
-    A["First visit: welcome modal<br/>Global / National / Near me / Topic"] --> B["Daily Briefing<br/>(temporary session lens)"]
-    B --> C["Open a story"]
-    C --> D["Quick Take — visible immediately"]
-    D --> E["Expand on demand:<br/>Key points → Why it matters → Deep dive"]
-    E --> F["Each fact marked seen<br/>(localStorage, fact-level IDs)"]
-    F --> G["Return later:<br/>only NEW facts shown"]
-    G --> H["Catch Me Up:<br/>updates since your last visit"]
-    C --> I["Evolution timeline:<br/>verified past — Now - - one possible future"]
-    B --> J["Save to reading queue<br/>(grouped by time cost)"]
-    K["Interests page<br/>(location, topics, content mix)"] -->|"shapes future ranking"| B
-    B -.->|"session lens never overwrites"| K
-```
+<img src="docs/flowchart.svg" alt="How Briefly works: pick a lens, read a briefing, open stories in levels, facts are remembered, and return visits show only what is new." width="420">
 
 ### The no-repeat engine
 
 Every story is built from facts with stable IDs (`src/lib/data/stories.ts`).
-The UI tracks which fact IDs you have actually rendered:
-
-```mermaid
-flowchart LR
-    S["Story facts"] --> Seen["Seen IDs in localStorage"]
-    S --> Unseen["Unseen IDs"]
-    Unseen -->|"shown under"| N["New since you read"]
-    Seen -->|"collapsed under"| P["Previously covered"]
-    N -->|"opened section marks facts seen"| Seen
-```
+The UI tracks which fact IDs you have actually rendered: unseen facts appear under
+“New since you read”, seen ones collapse under “Previously covered”, and opening a
+section marks its facts seen. If nothing is new, the app says so instead of
+inventing an update.
 
 Key helpers live in `src/lib/utils/storage.ts`:
 
@@ -68,13 +49,11 @@ only when the seed data includes evidence. It never looks like a confirmed fact.
 
 ## Screenshots
 
-| Daily briefing (mobile, dark mode) | Story detail with progressive reading |
-|---|---|
-| ![Mobile dark briefing](docs/screenshots/home-mobile-dark.png) | ![Story detail](docs/screenshots/story-desktop.png) |
+<p align="center">
+  <img src="docs/screenshots/home-mobile-dark.png" alt="Daily briefing on mobile in dark mode" width="280">
+</p>
 
-| Explore lenses and filters | Catch Me Up after time away |
-|---|---|
-| ![Explore](docs/screenshots/explore-desktop.png) | ![Catch Me Up](docs/screenshots/catchup-desktop.png) |
+![Story detail with progressive reading](docs/screenshots/story-desktop.png)
 
 ---
 
