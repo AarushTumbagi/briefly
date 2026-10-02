@@ -4,21 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Home, RefreshCw, Compass, Bookmark, Menu, X, Sun, Moon, Monitor } from 'lucide-react';
 import { useState } from 'react';
 import { usePreferences } from '@/lib/hooks/usePreferences';
-import { SCOPES, getScopeLabel } from '@/lib/data/scopes';
-import type { ReadingMode } from '@/types';
+import { buildScopes, getScopeLabel } from '@/lib/data/scopes';
 
 const NAV = [
   { href: '/', label: 'Briefing', icon: Home },
   { href: '/catch-up', label: 'Catch Up', icon: RefreshCw },
   { href: '/explore', label: 'Explore', icon: Compass },
   { href: '/saved', label: 'Saved', icon: Bookmark },
-];
-
-const MODES: { id: ReadingMode; label: string }[] = [
-  { id: 'standard', label: 'Standard' },
-  { id: '5min', label: '5 min' },
-  { id: '10min', label: '10 min' },
-  { id: 'deep', label: 'Deep' },
 ];
 
 export default function Header() {
@@ -50,13 +42,8 @@ export default function Header() {
           <div className="ml-auto flex items-center gap-2">
             <label className="sr-only" htmlFor="scope">Current scope</label>
             <select id="scope" value={activeScope} onChange={(e) => update({ sessionScope: e.target.value })}
-              className="input !w-auto text-sm !py-1.5" aria-label={`Current scope: ${getScopeLabel(activeScope)}`}>
-              {SCOPES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-            </select>
-            <label className="sr-only" htmlFor="mode">Reading time</label>
-            <select id="mode" value={prefs.defaultReadingMode} onChange={(e) => update({ defaultReadingMode: e.target.value as ReadingMode })}
-              className="input !w-auto text-sm !py-1.5 hidden sm:block" aria-label="Reading time">
-              {MODES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+              className="input !w-auto text-sm !py-1.5 max-w-[9rem] sm:max-w-none" aria-label={`Current scope: ${getScopeLabel(activeScope, prefs.location)}`}>
+              {buildScopes(prefs.location).map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
             <button onClick={cycleTheme} aria-label={`Theme: ${prefs.theme}. Activate to change.`} className="btn-ghost !px-2.5">
               {prefs.theme === 'dark' ? <Moon size={18} /> : prefs.theme === 'light' ? <Sun size={18} /> : <Monitor size={18} />}

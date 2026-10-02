@@ -17,7 +17,7 @@ export default function AboutPage() {
         </div>
         <div>
           <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Demo scope</h2>
-          <p className="mt-1">This version uses 12 hand-written seed stories, localStorage for preferences, saved items, theme and fact-level reading memory. No API keys, no scraping, no account. Deploy anywhere Next.js runs.</p>
+          <p className="mt-1">This version uses 12 hand-written seed stories, localStorage for preferences, saved items, theme and fact-level reading memory. No API keys, no scraping, no account. Deploy anywhere Next.js runs. Photos are stable placeholders, and demo coverage is centred on Jaipur, India — set your own location under Interests to relabel the lenses.</p>
         </div>
       </section>
     </div>

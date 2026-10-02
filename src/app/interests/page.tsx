@@ -1,9 +1,10 @@
 'use client';
 import { usePreferences } from '@/lib/hooks/usePreferences';
-import { TOPICS, SCOPES } from '@/lib/data/scopes';
+import { TOPICS, buildScopes } from '@/lib/data/scopes';
 
 export default function InterestsPage() {
   const { prefs, update } = usePreferences();
+  const scopes = buildScopes(prefs.location);
   const setTopic = (t: string, v: 'low' | 'medium' | 'high' | null) => {
     const next = { ...prefs.followedTopics };
     if (v === null) delete next[t]; else next[t] = v;
@@ -20,6 +21,26 @@ export default function InterestsPage() {
         <h1 className="page-title">Interests</h1>
         <p className="page-subtitle">Changing these affects future recommendations. It does not change what you are reading right now.</p>
       </div>
+
+      <section className="card p-5">
+        <h2 className="font-semibold">Your location</h2>
+        <p className="text-sm text-neutral-500 mt-1">Sets the National, Regional and Local lenses across the app.</p>
+        <div className="grid sm:grid-cols-3 gap-3 mt-3">
+          <div>
+            <label className="label" htmlFor="loc-country">Country</label>
+            <input id="loc-country" value={prefs.location.country} onChange={(e) => update({ location: { ...prefs.location, country: e.target.value } })} className="input" placeholder="India" />
+          </div>
+          <div>
+            <label className="label" htmlFor="loc-region">Region / State</label>
+            <input id="loc-region" value={prefs.location.region} onChange={(e) => update({ location: { ...prefs.location, region: e.target.value } })} className="input" placeholder="Rajasthan" />
+          </div>
+          <div>
+            <label className="label" htmlFor="loc-city">City</label>
+            <input id="loc-city" value={prefs.location.city} onChange={(e) => update({ location: { ...prefs.location, city: e.target.value } })} className="input" placeholder="Jaipur" />
+          </div>
+        </div>
+        <p className="text-xs text-neutral-400 mt-2">Demo note: seed stories are set in Jaipur, India, so story content stays Jaipur-based while your lens labels update.</p>
+      </section>
 
       <section className="card p-5">
         <h2 className="font-semibold">Followed topics</h2>
@@ -42,7 +63,7 @@ export default function InterestsPage() {
       <section className="card p-5">
         <h2 className="font-semibold">Followed places</h2>
         <div className="flex flex-wrap gap-2 mt-3">
-          {SCOPES.filter((s) => s.type !== 'topic').map((s) => {
+          {scopes.filter((s) => s.type !== 'topic').map((s) => {
             const on = prefs.followedPlaces.some((p) => p.id === s.id);
             return (
               <button key={s.id} onClick={() => togglePlace(s.id, s.label, s.level)} aria-pressed={on}
@@ -64,7 +85,7 @@ export default function InterestsPage() {
         <div>
           <label className="label" htmlFor="defscope">Default starting scope</label>
           <select id="defscope" value={prefs.defaultScope} onChange={(e) => update({ defaultScope: e.target.value })} className="input max-w-xs">
-            {SCOPES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            {scopes.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
         </div>
         <div>

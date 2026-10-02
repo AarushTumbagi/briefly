@@ -7,6 +7,7 @@ export const DEMO_REFRESH_DATE = '30 September 2026';
 export const DEFAULT_PREFS: UserPreferences = {
   theme: 'system',
   defaultReadingMode: 'standard',
+  location: { country: 'India', region: 'Rajasthan', city: 'Jaipur' },
   followedTopics: { AI: 'high', Science: 'medium' },
   followedPlaces: [{ id: 'jaipur', label: 'Jaipur / Local', level: 3 }],
   contentMix: 'both',
@@ -25,7 +26,7 @@ export function loadPrefs(): UserPreferences {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return { ...DEFAULT_PREFS };
     const parsed = JSON.parse(raw) as Partial<UserPreferences>;
-    return { ...DEFAULT_PREFS, ...parsed };
+    return { ...DEFAULT_PREFS, ...parsed, location: { ...DEFAULT_PREFS.location, ...(parsed.location ?? {}) } };
   } catch {
     return { ...DEFAULT_PREFS };
   }

@@ -66,9 +66,16 @@ export interface Story {
   isRead?: boolean;
 }
 
+export interface UserLocation {
+  country: string;
+  region: string;
+  city: string;
+}
+
 export interface UserPreferences {
   theme: Theme;
   defaultReadingMode: ReadingMode;
+  location: UserLocation;
   followedTopics: Record<string, 'low' | 'medium' | 'high'>;
   followedPlaces: Array<{ id: string; label: string; level: number }>;
   contentMix: 'news' | 'research' | 'both';

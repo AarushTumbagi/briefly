@@ -5,7 +5,7 @@ import { Bookmark, BookmarkCheck, Share2, Clock, GitBranch } from 'lucide-react'
 import { getStory, getRelatedStories } from '@/lib/data/stories';
 import { usePreferences } from '@/lib/hooks/usePreferences';
 import { ProgressiveStory } from '@/components/story/ProgressiveStory';
-import StoryCard from '@/components/story/StoryCard';
+import StoryCard, { storyImage } from '@/components/story/StoryCard';
 import { Badge } from '@/components/ui/controls';
 import { timeAgo, formatShortDate } from '@/lib/utils/format';
 import { useState } from 'react';
@@ -32,6 +32,8 @@ export default function StoryDetailPage() {
   return (
     <div className="section-container py-8 max-w-4xl space-y-6">
       <Link href="/" className="text-sm text-sky-700 dark:text-sky-300 underline underline-offset-2">← Back to briefing</Link>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={storyImage(story)} alt={story.imageAlt ?? story.headline} className="w-full h-60 sm:h-80 object-cover rounded-xl" />
       <header>
         <div className="flex flex-wrap gap-1.5">
           <Badge tone="brand">{story.scope.label}</Badge>

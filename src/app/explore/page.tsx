@@ -9,13 +9,14 @@ import { Empty } from '@/components/ui/controls';
 
 const EXAMPLES = ['What should I know about AI today?', 'What changed in Rajasthan this week?', 'Catch me up on science'];
 
-function parseQuery(q: string): { topic?: string; place?: string; time?: string } {
+function parseQuery(q: string, loc: { country: string; region: string; city: string }): { topic?: string; place?: string; time?: string } {
   const lower = q.toLowerCase();
   const out: { topic?: string; place?: string; time?: string } = {};
   for (const t of TOPICS) if (lower.includes(t.toLowerCase())) out.topic = t;
-  if (lower.includes('rajasthan')) out.place = 'rajasthan';
-  else if (lower.includes('jaipur')) out.place = 'jaipur';
-  else if (lower.includes('india')) out.place = 'india';
+  const city = loc.city.toLowerCase(), region = loc.region.toLowerCase(), country = loc.country.toLowerCase();
+  if ((city && lower.includes(city)) || lower.includes('jaipur')) out.place = 'jaipur';
+  else if ((region && lower.includes(region)) || lower.includes('rajasthan')) out.place = 'rajasthan';
+  else if ((country && lower.includes(country)) || lower.includes('india')) out.place = 'india';
   if (lower.includes('today')) out.time = 'today';
   else if (lower.includes('week')) out.time = 'week';
   return out;
@@ -63,7 +64,7 @@ function ExploreInner() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = parseQuery(query);
+    const parsed = parseQuery(query, prefs.location);
     const sp = new URLSearchParams();
     if (parsed.topic) sp.set('topic', parsed.topic);
     if (parsed.time) sp.set('date', parsed.time === 'today' ? 'today' : 'week');
@@ -108,7 +109,7 @@ function ExploreInner() {
       <div>
         <p className="label">Region drilldown</p>
         <div className="flex items-center gap-1 text-sm flex-wrap" aria-label="Region drilldown">
-          {['World', 'India', 'Rajasthan', 'Jaipur'].map((r, i) => (
+          {['World', prefs.location.country || 'India', prefs.location.region || 'Rajasthan', prefs.location.city || 'Jaipur'].map((r, i) => (
             <span key={r} className="flex items-center gap-1">
               {i > 0 && <span aria-hidden className="text-neutral-400">→</span>}
               <span className="px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800">{r}</span>

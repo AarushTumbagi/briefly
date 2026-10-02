@@ -7,12 +7,8 @@ import { timeAgo } from '@/lib/utils/format';
 import { usePreferences } from '@/lib/hooks/usePreferences';
 import { getUnseenFacts } from '@/lib/utils/storage';
 
-function FallbackVisual({ title }: { title: string }) {
-  return (
-    <div className="w-full h-44 bg-gradient-to-br from-sky-100 via-neutral-100 to-emerald-50 dark:from-sky-950 dark:via-neutral-900 dark:to-emerald-950 flex items-center justify-center p-6" role="img" aria-label={`Illustration for ${title}`}>
-      <span className="font-serif text-lg text-neutral-500 dark:text-neutral-400 text-center line-clamp-3">{title}</span>
-    </div>
-  );
+export function storyImage(story: Story): string {
+  return story.imageUrl || `https://picsum.photos/seed/${story.id}/800/450`;
 }
 
 export function whyLine(story: Story): string {
@@ -36,12 +32,8 @@ export default function StoryCard({ story, showUpdateBadge = true }: { story: St
 
   return (
     <article className="story-card flex flex-col">
-      {story.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={story.imageUrl} alt={story.imageAlt ?? story.headline} className="story-card-image" loading="lazy" />
-      ) : (
-        <FallbackVisual title={story.headline} />
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={storyImage(story)} alt={story.imageAlt ?? story.headline} className="story-card-image" loading="lazy" />
       <div className="p-5 flex flex-col gap-3 flex-1">
         <div className="flex flex-wrap gap-1.5">
           <Badge tone="brand">{story.scope.label}</Badge>
