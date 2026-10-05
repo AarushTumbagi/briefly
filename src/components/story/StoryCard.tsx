@@ -36,6 +36,7 @@ export default function StoryCard({ story, showUpdateBadge = true }: { story: St
       <img src={storyImage(story)} alt={story.imageAlt ?? story.headline} className="story-card-image" loading="lazy" />
       <div className="p-5 flex flex-col gap-3 flex-1">
         <div className="flex flex-wrap gap-1.5">
+          {story.origin === 'live' && <Badge tone="green">Live</Badge>}
           <Badge tone="brand">{story.scope.label}</Badge>
           {story.topicTags.map((t) => <Badge key={t}>{t}</Badge>)}
           {showUpdateBadge && unseen > 0 && <Badge tone="green">New update</Badge>}

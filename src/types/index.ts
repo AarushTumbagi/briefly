@@ -64,6 +64,7 @@ export interface Story {
   };
   isSaved?: boolean;
   isRead?: boolean;
+  origin?: 'seed' | 'live';
 }
 
 export interface UserLocation {

@@ -2,11 +2,14 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getStory } from '@/lib/data/stories';
+import { getLiveStory, useLiveNews } from '@/lib/hooks/useLiveNews';
 import EvolutionTimeline from '@/components/story/EvolutionTimeline';
 
 export default function EvolutionPage() {
   const { storyId } = useParams<{ storyId: string }>();
-  const story = getStory(storyId);
+  const { loading } = useLiveNews();
+  const story = getLiveStory(storyId) ?? getStory(storyId);
+  if (!story && loading) return <div className="section-container py-16 text-center"><p className="text-neutral-500">Loading timeline…</p></div>;
   if (!story) return <div className="section-container py-16 text-center"><h1 className="page-title">Story not found</h1></div>;
   return (
     <div className="section-container py-8 max-w-3xl space-y-6">

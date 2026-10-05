@@ -2,7 +2,7 @@
 import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { usePreferences } from '@/lib/hooks/usePreferences';
-import { STORIES, rankStories, dedupeStories } from '@/lib/utils/storage';
+import { useLiveNews } from '@/lib/hooks/useLiveNews';
 import StoryCard from '@/components/story/StoryCard';
 import { TOPICS } from '@/lib/data/scopes';
 import { Empty } from '@/components/ui/controls';
@@ -40,8 +40,9 @@ function ExploreInner() {
     router.replace(`/explore?${sp.toString()}`, { scroll: false });
   };
 
+  const { stories: allStories, liveCount } = useLiveNews();
   const results = useMemo(() => {
-    let list = dedupeStories(rankStories(STORIES, prefs));
+    let list = [...allStories];
     if (scopeTab !== 'all') {
       list = list.filter((s) => {
         if (scopeTab === 'global') return s.scope.type === 'global';
@@ -60,7 +61,7 @@ function ExploreInner() {
     if (depth === '5min') list = list.filter((s) => s.readingTime <= 5);
     if (depth === '10min') list = list.filter((s) => s.readingTime <= 12);
     return list;
-  }, [prefs, scopeTab, topic, dateF, content, depth]);
+  }, [allStories, scopeTab, topic, dateF, content, depth]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +148,7 @@ function ExploreInner() {
         </div>
       </div>
 
-      <p className="text-sm text-neutral-500" role="status">{results.length} stor{results.length === 1 ? 'y' : 'ies'} found</p>
+      <p className="text-sm text-neutral-500" role="status">{results.length} stor{results.length === 1 ? 'y' : 'ies'} found{liveCount > 0 ? ` · including ${liveCount} live` : ''}</p>
       {results.length === 0 ? <Empty title="No stories match these filters" body="Try widening the date range or clearing a topic." /> : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {results.map((s) => <StoryCard key={s.id} story={s} />)}

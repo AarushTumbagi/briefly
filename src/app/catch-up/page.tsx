@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { usePreferences } from '@/lib/hooks/usePreferences';
-import { STORIES, getStoryUpdateView } from '@/lib/utils/storage';
+import { useLiveNews } from '@/lib/hooks/useLiveNews';
+import { getStoryUpdateView } from '@/lib/utils/storage';
 import { timeAgo } from '@/lib/utils/format';
 
 const RANGES = [
@@ -16,15 +17,16 @@ export default function CatchUpPage() {
   const { prefs } = usePreferences();
   const [range, setRange] = useState('last');
 
+  const { stories: allStories } = useLiveNews();
   const groups = useMemo(() => {
     const cfg = RANGES.find((r) => r.id === range);
     const since = range === 'last'
       ? new Date(prefs.lastVisit).getTime()
       : Date.now() - (cfg?.hours ?? 24) * 3600000;
-    return STORIES.map((s) => ({ s, view: getStoryUpdateView(s, prefs.seenFacts[s.id] ?? []) }))
+    return allStories.map((s) => ({ s, view: getStoryUpdateView(s, prefs.seenFacts[s.id] ?? []) }))
       .filter(({ s, view }) => view.hasNew && new Date(s.updatedAt).getTime() >= since - 86400000)
       .sort((a, b) => b.view.unseen.length - a.view.unseen.length || +new Date(b.s.updatedAt) - +new Date(a.s.updatedAt));
-  }, [prefs, range]);
+  }, [allStories, prefs, range]);
 
   return (
     <div className="section-container py-8 max-w-4xl space-y-6">

@@ -18,7 +18,7 @@ export function buildScopes(loc: UserLocation = DEFAULT_LOCATION): Scope[] {
 // Backwards-compatible static list (default location).
 export const SCOPES: Scope[] = buildScopes(DEFAULT_LOCATION);
 
-export const TOPICS = ['AI', 'Technology', 'Science', 'Business', 'Health', 'Environment', 'Sports', 'Culture'];
+export const TOPICS = ['AI', 'Technology', 'Science', 'Business', 'Health', 'Environment', 'Sports', 'Culture', 'Politics', 'Entertainment', 'Education', 'World'];
 
 export function getScopeLabel(id?: string, loc: UserLocation = DEFAULT_LOCATION): string {
   if (!id) return 'Global';

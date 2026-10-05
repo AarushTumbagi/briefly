@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { usePreferences } from '@/lib/hooks/usePreferences';
-import { STORIES, rankStories, filterByReadingMode, dedupeStories, getUnseenFacts } from '@/lib/utils/storage';
+import { useLiveNews } from '@/lib/hooks/useLiveNews';
+import { filterByReadingMode, getUnseenFacts } from '@/lib/utils/storage';
 import { getScopeLabel, buildScopes } from '@/lib/data/scopes';
 import { formatDate, greeting, timeAgo } from '@/lib/utils/format';
 import StoryCard, { storyImage } from '@/components/story/StoryCard';
@@ -18,22 +19,28 @@ export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const ranked = useMemo(() => dedupeStories(filterByReadingMode(rankStories(STORIES, prefs, scope), prefs.defaultReadingMode)), [prefs, scope]);
+  const { stories: allStories, liveCount, loading, fetchedAt, refresh } = useLiveNews();
+  const ranked = useMemo(() => filterByReadingMode(allStories, prefs.defaultReadingMode), [allStories, prefs.defaultReadingMode]);
   const featured = ranked[0];
   const rest = ranked.slice(1, 1 + VISIBLE_COUNT);
   const totalMins = ranked.reduce((a, s) => a + s.readingTime, 0);
-  const updates = STORIES.filter((s) => getUnseenFacts(s, prefs.seenFacts[s.id] ?? []).length > 0).length;
+  const updates = allStories.filter((s) => getUnseenFacts(s, prefs.seenFacts[s.id] ?? []).length > 0).length;
 
   const snapshot = useMemo(() => {
     const loc = prefs.location;
     return [
-      { label: 'Global', href: '/explore?scope=global', count: STORIES.filter((s) => s.scope.id === 'global').length },
-      { label: loc.country, href: '/explore?scope=national', count: STORIES.filter((s) => s.scope.id === 'india').length },
-      { label: `Near ${loc.city}`, href: '/explore?scope=local', count: STORIES.filter((s) => ['jaipur', 'rajasthan'].includes(s.scope.id)).length },
-      { label: 'AI', href: '/explore?topic=AI', count: STORIES.filter((s) => s.topicTags.includes('AI')).length },
-      { label: 'Science', href: '/explore?topic=Science', count: STORIES.filter((s) => s.topicTags.includes('Science')).length },
+      { label: 'Global', href: '/explore?scope=global', count: allStories.filter((s) => s.scope.id === 'global').length },
+      { label: loc.country, href: '/explore?scope=national', count: allStories.filter((s) => s.scope.id === 'india').length },
+      { label: `Near ${loc.city}`, href: '/explore?scope=local', count: allStories.filter((s) => ['jaipur', 'rajasthan'].includes(s.scope.id)).length },
+      { label: 'AI', href: '/explore?topic=AI', count: allStories.filter((s) => s.topicTags.includes('AI')).length },
+      { label: 'Science', href: '/explore?topic=Science', count: allStories.filter((s) => s.topicTags.includes('Science')).length },
     ];
-  }, [prefs.location]);
+  }, [allStories, prefs.location]);
+
+  const liveMins = fetchedAt ? Math.max(0, Math.round((Date.now() - fetchedAt) / 60000)) : null;
+  const oneMinute = liveCount > 0 && ranked.length > 0
+    ? `Live right now: ${ranked.slice(0, 3).map((s) => s.headline).join(' · ')}`
+    : `Frontier labs aligned on shared AI safety tests, ${prefs.location.region}'s reservoirs recovered enough to ease ${prefs.location.city}'s water schedule, and ${prefs.location.country}'s digital health network passed 500 million records. Shipping lanes steadied — open a story only if you want more.`;
 
   const scopeLabel = getScopeLabel(scope, prefs.location);
   const following = prefs.followedPlaces.some((p) => p.id === scope);
@@ -52,9 +59,17 @@ export default function HomePage() {
         <div className="flex flex-wrap items-center gap-2 mt-3">
           <Badge tone="brand">{scopeLabel}</Badge>
           <Badge>{MODE_LABEL[prefs.defaultReadingMode]} read</Badge>
+          {liveCount > 0
+            ? <Badge tone="green">Live · {liveCount} stories</Badge>
+            : loading ? <Badge>Fetching live news…</Badge> : <Badge>Seed briefing</Badge>}
           <button onClick={toggleFollow} className="text-xs font-medium text-sky-700 dark:text-sky-300 underline underline-offset-2">
             {following ? 'Following this lens ✓' : 'Follow this topic/place'}
           </button>
+          {liveCount > 0 && (
+            <button onClick={refresh} className="text-xs text-neutral-500 underline underline-offset-2" aria-label="Refresh live news">
+              Refresh{liveMins !== null ? ` · ${liveMins}m ago` : ''}
+            </button>
+          )}
         </div>
         <p className="text-xs text-neutral-400 mt-2">This lens is temporary — it won&apos;t change your permanent interests.</p>
       </section>
@@ -63,9 +78,7 @@ export default function HomePage() {
       <section className="grid md:grid-cols-2 gap-4">
         <div className="card p-5">
           <h2 className="font-semibold">Today in one minute</h2>
-          <p className="text-sm mt-2 leading-relaxed text-neutral-700 dark:text-neutral-300">
-            Frontier labs aligned on shared AI safety tests, {prefs.location.region}&apos;s reservoirs recovered enough to ease {prefs.location.city}&apos;s water schedule, and {prefs.location.country}&apos;s digital health network passed 500 million records. Shipping lanes steadied — open a story only if you want more.
-          </p>
+          <p className="text-sm mt-2 leading-relaxed text-neutral-700 dark:text-neutral-300">{oneMinute}</p>
         </div>
         <div className="card p-5">
           <h2 className="font-semibold">Today&apos;s reading plan</h2>

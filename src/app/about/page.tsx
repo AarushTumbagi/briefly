@@ -17,7 +17,7 @@ export default function AboutPage() {
         </div>
         <div>
           <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Demo scope</h2>
-          <p className="mt-1">This version uses 12 hand-written seed stories, localStorage for preferences, saved items, theme and fact-level reading memory. No API keys, no scraping, no account. Deploy anywhere Next.js runs. Photos are stable placeholders, and demo coverage is centred on Jaipur, India — set your own location under Interests to relabel the lenses.</p>
+          <p className="mt-1">Briefly now reads live publisher RSS feeds (BBC, The Hindu, Indian Express, Al Jazeera, arXiv and more) through a cached server endpoint — no API keys, no scraping, no account. Similar coverage is merged into single stories, photos come from the feeds themselves, and 12 hand-written seed stories remain as fallback when feeds are unreachable. Set your own location under Interests to relabel the lenses.</p>
         </div>
       </section>
     </div>

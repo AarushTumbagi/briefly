@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Bookmark, BookmarkCheck, Share2, Clock, GitBranch } from 'lucide-react';
 import { getStory, getRelatedStories } from '@/lib/data/stories';
+import { getLiveStory, useLiveNews } from '@/lib/hooks/useLiveNews';
 import { usePreferences } from '@/lib/hooks/usePreferences';
 import { ProgressiveStory } from '@/components/story/ProgressiveStory';
 import StoryCard, { storyImage } from '@/components/story/StoryCard';
@@ -12,14 +13,23 @@ import { useState } from 'react';
 
 export default function StoryDetailPage() {
   const { storyId } = useParams<{ storyId: string }>();
-  const story = getStory(storyId);
+  const { loading, stories: allStories } = useLiveNews();
+  const story = getLiveStory(storyId) ?? getStory(storyId);
   const { prefs, update } = usePreferences();
   const [shared, setShared] = useState(false);
+  if (!story && loading) {
+    return <div className="section-container py-16 text-center"><p className="text-neutral-500">Loading story…</p></div>;
+  }
   if (!story) {
     return <div className="section-container py-16 text-center"><h1 className="page-title">Story not found</h1><Link href="/" className="btn-secondary mt-4 inline-flex">Back home</Link></div>;
   }
   const saved = prefs.savedStories.includes(story.id);
-  const related = getRelatedStories(story.id, 3);
+  const related = story.origin === 'live'
+    ? allStories.filter((s) => s.id !== story.id).map((s) => ({
+        s,
+        score: (s.scope.id === story.scope.id ? 3 : 0) + s.topicTags.filter((t) => story.topicTags.includes(t)).length * 2,
+      })).sort((a, b) => b.score - a.score).slice(0, 3).map((x) => x.s)
+    : getRelatedStories(story.id, 3);
 
   const share = async () => {
     const url = window.location.href;

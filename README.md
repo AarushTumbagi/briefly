@@ -97,13 +97,16 @@ only when the seed data includes evidence. It never looks like a confirmed fact.
 ## Tech
 
 - Next.js 14 (App Router) + TypeScript + Tailwind CSS (`darkMode: 'class'`)
-- Local seed data: 12 stories across Global, National, Regional/Local, AI,
-  Technology, Science, Sports, Business, Health, Environment, Culture —
-  including ongoing multi-milestone stories, two research items, and one
-  carefully-worded future possibility
+- **Live news pipeline** (`src/lib/news/`, `src/app/api/news/route.ts`): 17 free
+  publisher RSS feeds (BBC, The Hindu, Indian Express, Al Jazeera, arXiv cs.AI,
+  ESPNcricinfo…) fetched server-side and cached for 90s — no API keys, no
+  scraping, no paid services. Near-duplicate coverage is auto-clustered into
+  single stories; photos come from the feeds and rotate as news changes.
+  12 hand-written seed stories remain as fallback when feeds are unreachable.
+- 12 news areas: AI, Technology, Science, Business, Health, Environment, Sports,
+  Culture, Politics, Entertainment, Education, World — plus live research items
 - `localStorage` for theme, session scope, saved stories, reading history,
   seen facts, location, and preferences — no accounts, no tracking
-- Photos are stable placeholders; no API keys, scraping, or paid services
 
 ## Run locally
 

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { usePreferences } from '@/lib/hooks/usePreferences';
+import { getLiveStory } from '@/lib/hooks/useLiveNews';
 import { getStory } from '@/lib/data/stories';
 import { getUnseenFacts } from '@/lib/utils/storage';
 import { readingBucket, timeAgo } from '@/lib/utils/format';
@@ -9,7 +10,7 @@ import { Badge, Empty } from '@/components/ui/controls';
 
 export default function SavedPage() {
   const { prefs, update } = usePreferences();
-  const items = useMemo(() => prefs.savedStories.map((id) => getStory(id)).filter(Boolean), [prefs.savedStories]);
+  const items = useMemo(() => prefs.savedStories.map((id) => getLiveStory(id) ?? getStory(id)).filter(Boolean), [prefs.savedStories]);
   const groups = useMemo(() => ({
     quick: items.filter((s) => readingBucket(s!.readingTime) === 'quick'),
     medium: items.filter((s) => readingBucket(s!.readingTime) === 'medium'),
@@ -18,7 +19,7 @@ export default function SavedPage() {
 
   const remove = (id: string) => update({ savedStories: prefs.savedStories.filter((x) => x !== id) });
   const markRead = (id: string) => {
-    const story = getStory(id);
+    const story = getLiveStory(id) ?? getStory(id);
     if (!story) return;
     update({
       seenFacts: { ...prefs.seenFacts, [id]: story.facts.map((f) => f.id) },
